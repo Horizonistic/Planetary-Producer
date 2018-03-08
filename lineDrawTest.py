@@ -1,4 +1,4 @@
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 import random
 import math
 
@@ -16,7 +16,7 @@ MAX_TOTAL_SEGMENT_LENGTH = 1000
 MAX_NUM_LINES = 10
 Y_THESHOLD = 50
 
-LINE_WIDTH = 1
+LINE_WIDTH = 5
 
 
 for i in range(10):
@@ -45,11 +45,8 @@ for i in range(10):
         startingY.append(rand)
 
     # Initialize image and draw instances
-    img = Image.new(mode='RGBA', size=(imgX, imgY))
-    draw = ImageDraw.Draw(img)
-
-    # Circle outline
-    draw.ellipse((0, 0, 1000, 1000), BLACK_A, BLACK_A)
+    imgLines = Image.new(mode='RGBA', size=(imgX, imgY))
+    drawLine = ImageDraw.Draw(imgLines)
 
     # Draws lines from distances generated
     for n in startingY:
@@ -84,17 +81,26 @@ for i in range(10):
                 lastX = (chordLength + extraDistance) - newX 
                 f.write("lastX: " + str(lastX))
                 print("lastX: " + str(lastX))
-                draw.line((newX, newY, newX + lastX, newY + y), WHITE_A, LINE_WIDTH)
+                drawLine.line((newX, newY, newX + lastX, newY + y), WHITE_A, LINE_WIDTH)
                 break;
 
                 # Randomizes up or down
             if random.choice([True, False]):
                 y = -y
-            draw.line((newX, newY, newX + x, newY + y), WHITE_A, LINE_WIDTH)
+            drawLine.line((newX, newY, newX + x, newY + y), WHITE_A, LINE_WIDTH)
             newX += x
             newY += y
 
-    del draw
+    del drawLine
 
-    img.save(str(i) + ".png")
+    # Circle outline
+    imgEllipse = Image.new(mode='RGBA', size=(imgX, imgY))
+    drawEllipse = ImageDraw.Draw(imgEllipse)
+    drawEllipse.ellipse((0, 0, 1000, 1000), BLACK_A, BLACK_A)
+
+    imgLines = imgLines.filter(ImageFilter.BLUR)
+    
+    imgFinal = Image.alpha_composite(imgEllipse, imgLines)
+
+    imgFinal.save(str(i) + ".png")
     f.close()
