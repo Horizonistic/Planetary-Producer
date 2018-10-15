@@ -1,6 +1,7 @@
 #!/usr/bin/python
  
 from gimpfu import *
+import random
  
 def plugin_main(image, drawable, planet_radius, hue, saturation, cloud_detail, mblur_distance, tilt, shift, shadow_color):
 
@@ -36,8 +37,11 @@ def plugin_main(image, drawable, planet_radius, hue, saturation, cloud_detail, m
     # Image, layer, parent, position
     pdb.gimp_image_insert_layer(image, new_layer, None, -1)
 
+    # todo?: make seed customizable
+    # Random seed for solid noise
+    noise_seed = random.randint(0, 2147483646)
     # Image, drawable, tilable, turbulent, seed, detail, xsize, ysize
-    pdb.plug_in_solid_noise(image, new_layer, 0, 0, 0, 1, cloud_detail, cloud_detail)
+    pdb.plug_in_solid_noise(image, new_layer, 0, 0, noise_seed, 1, cloud_detail, cloud_detail)
 
     # Image, layer, distance, direction
     pdb.plug_in_shift(image, new_layer, shift, 1)
